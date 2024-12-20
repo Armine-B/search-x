@@ -1,5 +1,6 @@
-import React, {useState, useEffect, useRef, useMemo, useCallback} from 'react';
+import React, {useState, useEffect, useRef, useMemo, useCallback, memo} from 'react';
 import fakeDatabase from "../../db/database";
+import {debounce} from "../../helpers";
 
 function SearchInput({onSearch, history, onRemoveHistory}) {
     const [query, setQuery] = useState('');
@@ -12,18 +13,24 @@ function SearchInput({onSearch, history, onRemoveHistory}) {
         inputRef.current.focus();
     }, []);
 
+    const debouncedSearch = useMemo(
+        () => debounce((query) => {
+            if (query) {
+                const filteredResults = fakeDatabase.filter(item => item.title.toLowerCase().includes(query.toLowerCase()));
+                setAutocompleteResults(filteredResults);
+                setShowAutocompleteResults(true);
+            } else {
+                setAutocompleteResults([]);
+                setShowAutocompleteResults(false);
+            }
+        }, 300),
+        []
+    );
+
     const handleChange = (e) => {
         const value = e.target.value;
         setQuery(value);
-
-        if (value) {
-            const filteredResults = fakeDatabase.filter(item => item.title.toLowerCase().includes(value.toLowerCase()));
-            setAutocompleteResults(filteredResults);
-            setShowAutocompleteResults(true);
-        } else {
-            setAutocompleteResults([]);
-            setShowAutocompleteResults(false);
-        }
+        debouncedSearch(value);
     };
 
     const handleSelect = (result) => {
@@ -44,58 +51,71 @@ function SearchInput({onSearch, history, onRemoveHistory}) {
     };
 
     const handleFocus = () => {
-        if (!query && history.length > 0) {
-            setAutocompleteResults(history)
+        if (!query && history.length > 0 && !showAutocompleteResults) {
+            setAutocompleteResults(history);
         }
-        if (autocompleteResults.length > 0 || history.length > 0) {
-            setShowAutocompleteResults(true);
-        }
-    }
+        setShowAutocompleteResults(prev => !prev);
+    };
 
     const handleEnterPress = (event) => {
         if (event.key === 'Enter') {
             onSearch(query);
         }
-    }
+    };
+
     const handleMouseDown = (event) => {
         event.preventDefault();
         inputRef.current.focus();
     };
 
-    const showResults = useMemo(() => showAutocompleteResults && autocompleteResults.length > 0, [showAutocompleteResults, autocompleteResults.length])
-    const isInHistory = useCallback((item) => history.find(el => el.title === item.title)
-        , [history]);
+    const showResults = useMemo(() => showAutocompleteResults && autocompleteResults.length > 0, [showAutocompleteResults, autocompleteResults.length]);
+    const isInHistory = useCallback((item) => history.find(el => el.title === item.title), [history]);
 
-    return (<div className="input-wrapper">
-        <input
-            className={`search-input${showResults ? ' has-results ' : ''}`}
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            onClick={handleFocus}
-            onKeyDown={handleEnterPress}
-            placeholder="Search..."
-        />
-        {showResults && (
-            <ul className="autocomplete-results" ref={autoCompleteResultsRef} onMouseDown={handleMouseDown}>
-                {autocompleteResults.slice(0, 10).map((item, index) => (<li
-                    key={index}
-                    onClick={() => handleSelect(item)}
-                    style={{color: isInHistory(item) ? 'purple' : 'black'}}
-                >
-                    <div>
-                        <img width='20' height="20"
-                             src={`/images/${isInHistory(item) ? 'clock' : 'search-interface-symbol'}.png`}
-                             alt='icon'/>
-                        <h2>{item.title} </h2>
-                    </div>
-                    {isInHistory(item) && (
-                        <button onClick={(e) => handleHistoryRemove(e, item)}>Remove</button>)}
-                </li>))}
-            </ul>)}
-    </div>);
+    return (
+        <div className="input-wrapper">
+            <div className="search-input-wrapper">
+                <input
+                    className={`search-input${showResults ? ' has-results' : ''}`}
+                    ref={inputRef}
+                    type="text"
+                    value={query}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    onClick={handleFocus}
+                    onKeyDown={handleEnterPress}
+                    placeholder="Search..."
+                />
+                <img
+                    width="16"
+                    height="16"
+                    src="/images/search-interface-symbol.png"
+                    alt="Search Icon"
+                    className="search-input-icon"
+                />
+            </div>
+            {showResults && (
+                <ul className="autocomplete-results" ref={autoCompleteResultsRef} onMouseDown={handleMouseDown}>
+                    {autocompleteResults.slice(0, 10).map((item, index) => (
+                        <li
+                            key={index}
+                            onClick={() => handleSelect(item)}
+                            style={{color: isInHistory(item) ? 'purple' : 'black'}}
+                        >
+                            <div>
+                                <img width='16' height="16"
+                                     src={`/images/${isInHistory(item) ? 'clock' : 'search-interface-symbol'}.png`}
+                                     alt='icon'/>
+                                <p>{item.title}</p>
+                            </div>
+                            {isInHistory(item) && (
+                                <button onClick={(e) => handleHistoryRemove(e, item)}>Remove</button>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
 }
 
-export default SearchInput;
+export default memo(SearchInput);

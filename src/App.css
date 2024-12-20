@@ -8,11 +8,6 @@ h1 {
     text-align: center;
 }
 
-input {
-    padding: 10px;
-    font-size: 16px;
-    width: 300px;
-}
 
 ul {
     list-style-type: none;
@@ -21,7 +16,6 @@ ul {
 
 
 button {
-    margin-left: 10px;
     background-color: transparent;
     border: none;
     padding: 5px;
@@ -35,9 +29,24 @@ button {
     position: relative;
 }
 
-.search-input {
+.search-input-wrapper {
+    position: relative;
     width: 100%;
-    border-radius: 8px;
+}
+
+.search-input-icon {
+    position: absolute;
+    left: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.search-input {
+    font-size: 1rem;
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 3.25rem;
+    border-radius: 2rem;
     border-style: solid;
     border-color: black;
 
@@ -50,6 +59,8 @@ button {
 
 }
 
+
+
 .search-results {
     margin: 4rem;
 }
@@ -59,15 +70,15 @@ button {
     left: 4rem;
     border: 2px solid black;
     border-top: none;
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 2rem;
+    border-bottom-left-radius: 2rem;
     margin: 0;
     right: 4rem;
     top: 72px;
     background-color: white;
 
     li {
-        padding: 8px;
+        padding: 1.5rem;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -77,6 +88,13 @@ button {
             display: flex;
             column-gap: 0.5rem;
             align-items: center;
+        }
+        &:hover {
+            background-color: lightgray;
+        }
+        &:last-of-type{
+            border-bottom-right-radius: 2rem;
+            border-bottom-left-radius: 2rem;
         }
     }
 }

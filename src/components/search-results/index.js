@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, memo} from 'react';
 import fakeDatabase from "../../db/database";
 
-function SearchResults({query}) {
+function SearchResults({ query }) {
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [searchDuration, setSearchDuration] = useState(0);
@@ -10,6 +10,7 @@ function SearchResults({query}) {
         if (query) {
             setIsLoading(true);
             const startTime = Date.now();
+
             const filteredResults = fakeDatabase.filter(item =>
                 item.title.toLowerCase().includes(query.toLowerCase())
             );
@@ -19,18 +20,17 @@ function SearchResults({query}) {
                 setResults(filteredResults);
                 setSearchDuration(Math.round(endTime - startTime));
                 setIsLoading(false);
-            }, 1000 / filteredResults.length); // simulating search delay depending on the count of the results
+            }, 1000 / filteredResults.length);
 
         } else {
             setResults([]);
-            setSearchDuration(0)
+            setSearchDuration(0);
         }
     }, [query]);
 
-
     return (
         <div className="search-results">
-            {isLoading ? (<div> Loading ...</div>) :
+            {isLoading ? (<div>Loading...</div>) :
                 <>
                     {searchDuration > 0 && (
                         <p>Results: {results.length} ({searchDuration}ms)</p>
@@ -38,18 +38,16 @@ function SearchResults({query}) {
                     <ul>
                         {results.map((item, index) => (
                             <li key={index}>
-                                <a className="result-title" href={`#${item.title}`} target="_blank"
-                                   rel="noopener noreferrer">
+                                <a className="result-title" href={`#${item.title}`} target="_blank" rel="noopener noreferrer">
                                     {item.title}
                                 </a>
                                 <p>{item.description}</p>
                             </li>
                         ))}
-
                     </ul>
                 </>}
         </div>
-    )
+    );
 }
 
-export default SearchResults;
+export default memo(SearchResults);
