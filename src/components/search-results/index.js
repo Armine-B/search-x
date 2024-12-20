@@ -33,7 +33,7 @@ function SearchResults({query}) {
             {isLoading ? (<div> Loading ...</div>) :
                 <>
                     {searchDuration > 0 && (
-                        <p>Results: {results.length} ({setSearchDuration}ms)</p>
+                        <p>Results: {results.length} ({searchDuration}ms)</p>
                     )}
                     <ul>
                         {results.map((item, index) => (

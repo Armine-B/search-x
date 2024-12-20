@@ -10,13 +10,13 @@ function App() {
 
     const handleSearch = (searchQuery) => {
         setQuery(searchQuery);
-        if (!history.includes(searchQuery)) {
-            setHistory(prev=> ([searchQuery, ...prev]));
+        if (!history.find(el => el.title === searchQuery)) {
+            setHistory(prev => ([{title: searchQuery}, ...prev]));
         }
     };
 
     const handleRemoveHistory = (item) => {
-        setHistory(prev => prev.filter(historyItem => historyItem !== item.title));
+        setHistory(prev => prev.filter(historyItem => historyItem.title !== item.title));
     };
 
     return (
