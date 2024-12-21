@@ -60,6 +60,7 @@ function SearchInput({onSearch, history, onRemoveHistory}) {
     const handleEnterPress = (event) => {
         if (event.key === 'Enter') {
             onSearch(query);
+            setShowAutocompleteResults(false)
         }
     };
 

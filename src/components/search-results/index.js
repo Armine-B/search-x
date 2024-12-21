@@ -20,7 +20,7 @@ function SearchResults({ query }) {
                 setResults(filteredResults);
                 setSearchDuration(Math.round(endTime - startTime));
                 setIsLoading(false);
-            }, 1000 / filteredResults.length);
+            }, 1000 * filteredResults.length);
 
         } else {
             setResults([]);
@@ -33,13 +33,13 @@ function SearchResults({ query }) {
             {isLoading ? (<div>Loading...</div>) :
                 <>
                     {searchDuration > 0 && (
-                        <p>Results: {results.length} ({searchDuration}ms)</p>
+                        <p className="duration">Results: {results.length} ({searchDuration}ms)</p>
                     )}
                     <ul>
                         {results.map((item, index) => (
                             <li key={index}>
                                 <a className="result-title" href={`#${item.title}`} target="_blank" rel="noopener noreferrer">
-                                    {item.title}
+                                    <h3>{item.title} </h3>
                                 </a>
                                 <p>{item.description}</p>
                             </li>
